@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPM Effort Estimation & Cost Planning System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+
+<body class="bg-light">
+    <nav class="navbar navbar-dark bg-primary sticky-top">
+        <div class="container px-2 px-md-3">
+            <div class="d-flex align-items-center gap-2 flex-grow-1">
+                <span class="navbar-brand mb-0">📊 SPM Effort Estimation System</span>
+                <span class="navbar-text text-white d-none d-sm-inline" style="font-size: 12px;">Software Project
+                    Management Tools</span>
+            </div>
+            <div class="d-flex align-items-center gap-2 ms-auto">
+                <span id="userDisplay" class="navbar-text text-white d-none d-md-inline"
+                    style="font-size: 11px;"></span>
+                <button id="themeToggle" class="btn btn-sm btn-primary text-white border-1 border-white"
+                    style="font-size: 11px; padding: 4px 8px;">🌙 Dark</button>
+                <button id="historyToggle"
+                    class="btn btn-sm btn-primary text-white border-1 border-white d-none d-md-block"
+                    style="font-size: 11px; padding: 4px 8px;">📜 History</button>
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-primary text-white border-1 border-white dropdown-toggle"
+                        type="button" id="settingsMenu" data-bs-toggle="dropdown" aria-expanded="false"
+                        style="font-size: 11px; padding: 4px 8px;">
+                        ⚙️ Settings
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" aria-labelledby="settingsMenu">
+                        <li><a class="dropdown-item" href="#" onclick="clearAllData(); return false;">🗑️ Clear All
+                                Data</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="#" onclick="exportData(); return false;">💾 Export Data</a>
+                        </li>
+                        <li><a class="dropdown-item" href="#" onclick="importData(); return false;">📥 Import Data</a>
+                        </li>
+                    </ul>
+                </div>
+                <a href="/logout" class="btn btn-sm btn-primary text-white border-1 border-white d-none d-md-block"
+                    style="font-size: 11px; padding: 4px 8px;">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-2 mt-md-4 px-2 px-md-4">
+        <!-- Software Manager Header Cards -->
+        <div style="text-align: center; margin-bottom: 30px;">
+            <div class="manager-cards-container">
+                <div class="manager-card" onclick="switchModule('estimation')" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <div class="card-icon">📈</div>
+                    <div class="card-title">Effort Estimation</div>
+                </div>
+                <div class="manager-card" onclick="switchModule('schedule', 'costChart')" style="background: linear-gradient(135deg, #764ba2 0%, #f093fb 100%);">
+                    <div class="card-icon">💰</div>
+                    <div class="card-title">Cost Planning</div>
+                </div>
+                <div class="manager-card" onclick="switchModule('schedule', 'ganttChart')" style="background: linear-gradient(135deg, #f093fb 0%, #0dcaf0 100%);">
+                    <div class="card-icon">📅</div>
+                    <div class="card-title">Schedule</div>
+                </div>
+                <div class="manager-card" onclick="switchModule('risk')" style="background: linear-gradient(135deg, #0dcaf0 0%, #198754 100%);">
+                    <div class="card-icon">⚠️</div>
+                    <div class="card-title">Risk Management</div>
+                </div>
+                <div class="manager-card" onclick="switchModule('evm')" style="background: linear-gradient(135deg, #198754 0%, #ffc107 100%);">
+                    <div class="card-icon">📊</div>
+                    <div class="card-title">EVM Tracking</div>
+                </div>
+                <div class="manager-card" onclick="switchModule('dashboard')" style="background: linear-gradient(135deg, #ffc107 0%, #dc3545 100%);">
+                    <div class="card-icon">🎯</div>
+                    <div class="card-title">Dashboard</div>
+                </div>
+                <div class="manager-card" onclick="switchModule('report')" style="background: linear-gradient(135deg, #dc3545 0%, #667eea 100%);">
+                    <div class="card-icon">📄</div>
+                    <div class="card-title">Reports</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-2">
+            <!-- History Sidebar (Hidden by default, full-width on mobile) -->
+            <div id="historySidebar" class="col-12 col-lg-2" style="display: none;">
+                <div class="card bg-light" style="position: sticky; top: 80px; z-index: 10;">
+                    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">📜 History</h6>
+                        <button class="btn btn-sm btn-light" onclick="clearHistory()" title="Clear history">🗑️</button>
+                    </div>
+                    <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                        <div id="historyList" style="font-size: 11px;">
+                            <p class="text-muted">No activities</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar Navigation (Horizontal buttons on mobile, vertical sidebar on tablet+) -->
+            <div id="sidebarNav" class="col-12 col-lg-3 order-lg-2">
+                <div class="list-group">
+                    <button class="list-group-item list-group-item-action active" onclick="switchModule('project')">
+                        📋 Project Input
+                    </button>
+                    <button class="list-group-item list-group-item-action" onclick="switchModule('estimation')">
+                        📈 Effort Estimation
+                    </button>
+                    <button class="list-group-item list-group-item-action" onclick="switchModule('schedule')">
+                        📅 Schedule & Cost
+                    </button>
+                    <button class="list-group-item list-group-item-action" onclick="switchModule('risk')">
+                        ⚠️ Risk Management
+                    </button>
+                    <button class="list-group-item list-group-item-action" onclick="switchModule('evm')">
+                        📊 EVM Tracking
+                    </button>
+                    <button class="list-group-item list-group-item-action" onclick="switchModule('dashboard')">
+                        🎯 Dashboard
+                    </button>
+                    <button class="list-group-item list-group-item-action" onclick="switchModule('report')">
+                        📄 Reports
+                    </button>
+                </div>
+            </div>
+
+            <!-- Main Content Area -->
+            <div id="mainContent" class="col-12 col-lg-9 order-lg-3">
+                <!-- PROJECT INPUT MODULE -->
+                <div id="project" class="module-content">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">📋 Project Input Module</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="projectForm">
+                                <div class="mb-3">
+                                    <label for="projectName" class="form-label">Project Name</label>
+                                    <input type="text" class="form-control" id="projectName"
+                                        placeholder="Enter project name" required>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="projectType" class="form-label">Project Type</label>
+                                        <select class="form-select" id="projectType" required>
+                                            <option value="">-- Select --</option>
+                                            <option value="Organic">Organic (Small, well-understood)</option>
+                                            <option value="Semi-Detached">Semi-Detached (Medium complexity)</option>
+                                            <option value="Embedded">Embedded (Complex, integrated)</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label for="kloc" class="form-label">Project Size (KLOC)</label>
+                                        <input type="number" class="form-control" id="kloc" placeholder="e.g., 50"
+                                            step="0.1" min="0" required>
+                                        <small class="text-muted">Kilo Lines of Code</small>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="costPerPersonMonth" class="form-label">Cost per Person-Month</label>
+                                        <input type="number" class="form-control" id="costPerPersonMonth"
+                                            placeholder="e.g., 5000" step="100" min="0" required>
+                                        <small class="text-muted">In currency units</small>
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label for="teamExperience" class="form-label">Team Experience Level</label>
+                                        <select class="form-select" id="teamExperience" required>
+                                            <option value="">-- Select --</option>
+                                            <option value="Junior">Junior</option>
+                                            <option value="Intermediate">Intermediate</option>
+                                            <option value="Senior">Senior</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-primary btn-lg">Create Project</button>
+                                </div>
+                            </form>
+
+                            <hr>
+
+                            <h6>Recent Projects</h6>
+                            <div id="projectList"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EFFORT ESTIMATION MODULE -->
+                <div id="estimation" class="module-content" style="display:none;">
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">📈 Effort Estimation Module (COCOMO)</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="estimationProject" class="form-label">Select Project</label>
+                                <select class="form-select" id="estimationProject"
+                                    onchange="loadProjectForEstimation()">
+                                    <option value="">-- Select Project --</option>
+                                </select>
+                            </div>
+
+                            <ul class="nav nav-tabs mb-3" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="basic-tab" data-bs-toggle="tab"
+                                        data-bs-target="#basic" type="button" role="tab">
+                                        Basic COCOMO
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="intermediate-tab" data-bs-toggle="tab"
+                                        data-bs-target="#intermediate" type="button" role="tab">
+                                        Intermediate COCOMO
+                                    </button>
+                                </li>
+                            </ul>
+
+                            <!-- Basic COCOMO Tab -->
+                            <div class="tab-content">
+                                <div class="tab-pane fade show active" id="basic" role="tabpanel">
+                                    <p class="text-muted">Basic COCOMO formula: Effort = a × (KLOC)<sup>b</sup></p>
+                                    <button class="btn btn-success" onclick="calculateBasicCOCOMO()">Calculate Basic
+                                        COCOMO</button>
+                                    <div id="basicResults" class="mt-3"></div>
+                                </div>
+
+                                <!-- Intermediate COCOMO Tab -->
+                                <div class="tab-pane fade" id="intermediate" role="tabpanel">
+                                    <p class="text-muted">Intermediate COCOMO applies effort multipliers based on
+                                        project characteristics</p>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Effort Multipliers</label>
+                                        <div class="card bg-light p-3">
+                                            <div class="row">
+                                                <div class="col-md-6 mb-2">
+                                                    <label for="reliability" class="form-label">Required Software
+                                                        Reliability</label>
+                                                    <select class="form-select" id="reliability">
+                                                        <option value="Nominal">Nominal</option>
+                                                        <option value="Very Low">Very Low</option>
+                                                        <option value="Low">Low</option>
+                                                        <option value="High">High</option>
+                                                        <option value="Very High">Very High</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6 mb-2">
+                                                    <label for="complexity" class="form-label">Product
+                                                        Complexity</label>
+                                                    <select class="form-select" id="complexity">
+                                                        <option value="Nominal">Nominal</option>
+                                                        <option value="Simple">Simple</option>
+                                                        <option value="Low">Low</option>
+                                                        <option value="High">High</option>
+                                                        <option value="Very High">Very High</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <button class="btn btn-success" onclick="calculateIntermediateCOCOMO()">Calculate
+                                        Intermediate COCOMO</button>
+                                    <div id="intermediateResults" class="mt-3"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SCHEDULE & COST MODULE -->
+                <div id="schedule" class="module-content" style="display:none;">
+                    <div class="card">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">📅 Schedule & Cost Estimation</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="scheduleProject" class="form-label">Select Project</label>
+                                <select class="form-select" id="scheduleProject" onchange="loadScheduleData()">
+                                    <option value="">-- Select Project --</option>
+                                </select>
+                            </div>
+
+                            <div id="scheduleResults" class="mt-3">
+                                <div class="alert alert-info">Select a project to view cost distribution and schedule
+                                </div>
+                            </div>
+
+                            <!-- Phase-wise Cost Distribution Chart -->
+                            <div class="mt-4">
+                                <h6>Phase-wise Cost Distribution</h6>
+                                <canvas id="costChart" width="400" height="200"></canvas>
+                            </div>
+
+                            <!-- Gantt Chart Simulation -->
+                            <div class="mt-4">
+                                <h6>Project Schedule (Gantt Chart)</h6>
+                                <div id="ganttChart"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RISK MANAGEMENT MODULE -->
+                <div id="risk" class="module-content" style="display:none;">
+                    <div class="card">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="mb-0">⚠️ Risk Management Module</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="riskProject" class="form-label">Select Project</label>
+                                <select class="form-select" id="riskProject" onchange="loadProjectRisks()">
+                                    <option value="">-- Select Project --</option>
+                                </select>
+                            </div>
+
+                            <h6>Add New Risk</h6>
+                            <form id="riskForm" class="mb-4">
+                                <div class="row">
+                                    <div class="col-md-6 mb-2">
+                                        <input type="text" class="form-control" id="riskName" placeholder="Risk Name"
+                                            required>
+                                    </div>
+                                    <div class="col-md-6 mb-2">
+                                        <select class="form-select" id="riskCategory" required>
+                                            <option value="">Risk Category</option>
+                                            <option value="Technical">Technical</option>
+                                            <option value="Resource">Resource</option>
+                                            <option value="Schedule">Schedule</option>
+                                            <option value="External">External</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-4 mb-2">
+                                        <label class="form-label">Probability (0-1)</label>
+                                        <input type="number" class="form-control" id="probability" min="0" max="1"
+                                            step="0.1" required>
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <label class="form-label">Impact (0-1)</label>
+                                        <input type="number" class="form-control" id="impact" min="0" max="1" step="0.1"
+                                            required>
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <label class="form-label">Adjustment Factor</label>
+                                        <input type="number" class="form-control" id="adjustmentFactor" min="0.5"
+                                            max="1.5" step="0.05" value="1.0" required>
+                                    </div>
+                                </div>
+
+                                <div class="mb-2">
+                                    <textarea class="form-control" id="riskDescription" placeholder="Risk Description"
+                                        rows="2"></textarea>
+                                </div>
+
+                                <button type="submit" class="btn btn-warning">Add Risk</button>
+                            </form>
+
+                            <h6>Project Risks</h6>
+                            <div id="riskList" class="mt-3"></div>
+
+                            <hr>
+
+                            <button class="btn btn-danger" onclick="applyRiskAdjustments()">Apply Risk Adjustments to
+                                Estimation</button>
+                            <div id="adjustmentResults" class="mt-3"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EVM TRACKING MODULE -->
+                <div id="evm" class="module-content" style="display:none;">
+                    <div class="card">
+                        <div class="card-header bg-danger text-white">
+                            <h5 class="mb-0">📊 Earned Value Management (EVM) Module</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="evmProject" class="form-label">Select Project</label>
+                                <select class="form-select" id="evmProject" onchange="loadEVMData()">
+                                    <option value="">-- Select Project --</option>
+                                </select>
+                            </div>
+
+                            <h6>Record EVM Data</h6>
+                            <form id="evmForm" class="mb-4">
+                                <div class="row">
+                                    <div class="col-md-3 mb-2">
+                                        <label class="form-label">Planned Value (PV)</label>
+                                        <input type="number" class="form-control" id="pv" placeholder="0.00" step="0.01"
+                                            min="0" required>
+                                    </div>
+                                    <div class="col-md-3 mb-2">
+                                        <label class="form-label">Earned Value (EV)</label>
+                                        <input type="number" class="form-control" id="ev" placeholder="0.00" step="0.01"
+                                            min="0" required>
+                                    </div>
+                                    <div class="col-md-3 mb-2">
+                                        <label class="form-label">Actual Cost (AC)</label>
+                                        <input type="number" class="form-control" id="ac" placeholder="0.00" step="0.01"
+                                            min="0" required>
+                                    </div>
+                                    <div class="col-md-3 mb-2">
+                                        <label class="form-label">% Complete</label>
+                                        <input type="number" class="form-control" id="percentComplete" placeholder="0"
+                                            min="0" max="100" step="1" required>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn-danger">Record EVM Data</button>
+                            </form>
+
+                            <h6>EVM Metrics</h6>
+                            <div id="evmMetrics" class="mt-3">
+                                <div class="alert alert-info">Record EVM data to calculate metrics</div>
+                            </div>
+
+                            <!-- EVM Charts -->
+                            <div class="row mt-4">
+                                <div class="col-md-6">
+                                    <h6>Project Status Indicator</h6>
+                                    <canvas id="statusChart"></canvas>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>EVM Performance Indices</h6>
+                                    <canvas id="evmChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DASHBOARD MODULE -->
+                <div id="dashboard" class="module-content" style="display:none;">
+                    <div class="card">
+                        <div class="card-header bg-secondary text-white">
+                            <h5 class="mb-0">🎯 Project Dashboard</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="dashboardProject" class="form-label">Select Project</label>
+                                <select class="form-select" id="dashboardProject" onchange="loadDashboard()">
+                                    <option value="">-- Select Project --</option>
+                                </select>
+                            </div>
+
+                            <div id="dashboardContent" class="mt-3">
+                                <div class="alert alert-info">Select a project to view dashboard</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- REPORT MODULE -->
+                <div id="report" class="module-content" style="display:none;">
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            <h5 class="mb-0">📄 Project Report</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="reportProject" class="form-label">Select Project</label>
+                                <select class="form-select" id="reportProject" onchange="loadReport()">
+                                    <option value="">-- Select Project --</option>
+                                </select>
+                            </div>
+
+                            <div id="reportContent" class="mt-3">
+                                <div class="alert alert-info">Select a project to generate report</div>
+                            </div>
+
+                            <button class="btn btn-primary mt-3" onclick="printReport()">Print Report</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Chart.js for visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <!-- Application JS -->
+    <script src="/assets/js/app.js"></script>
+</body>
+
+</html>
