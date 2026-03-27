@@ -156,6 +156,26 @@ body, html {
     }
 }
 
+/* Final alignment parity with /home reference */
+#mainContent {
+    margin-top: 1rem;
+}
+
+#sidebarNav {
+    border-right: 1px solid rgba(0,0,0,.08);
+}
+
+#mainContent .card {
+    margin-bottom: 1rem;
+}
+
+@media (max-width: 1200px) {
+    #sidebarNav {
+        border-right: none;
+    }
+}
+
+
 
 body.dark-theme .dropdown-menu {
     background-color: #2d2d2d;
