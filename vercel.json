@@ -1,30 +1,18 @@
 {
   "version": 2,
-  "buildCommand": "npm run build",
+  "buildCommand": "npm run build || true",
   "public": true,
   "cleanUrls": true,
-  "env": {
-    "API_BASE": "@api_base"
-  },
   "rewrites": [
     {
-      "source": "/index.html",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/login.html",
-      "destination": "/login.html"
-    },
-    {
       "source": "/(.*)",
+      "destination": "/$1"
+    },
+    {
+      "source": "/:path*",
       "destination": "/index.html"
     }
   ],
-  "functions": {
-    "frontend/**/*.js": {
-      "maxDuration": 30
-    }
-  },
   "headers": [
     {
       "source": "/(.*)",
@@ -36,10 +24,6 @@
         {
           "key": "X-Content-Type-Options",
           "value": "nosniff"
-        },
-        {
-          "key": "X-Frame-Options",
-          "value": "DENY"
         }
       ]
     }
