@@ -119,6 +119,44 @@ body.dark-theme .badge {
     color: white;
 }
 
+/* Responsive and layout adjustments for Vercel /home parity */
+body, html {
+    min-height: 100%;
+}
+
+.container-fluid {
+    margin: 0 auto;
+    max-width: 1360px;
+    padding: 1rem;
+}
+
+.manager-cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.manager-card {
+    flex: 1 1 160px;
+    min-width: 140px;
+    text-align: center;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+@media (max-width: 768px) {
+    .container-fluid {
+        padding: 0.6rem;
+    }
+
+    .manager-card {
+        min-width: 120px;
+        font-size: 0.9rem;
+    }
+}
+
+
 body.dark-theme .dropdown-menu {
     background-color: #2d2d2d;
     border-color: #444;
