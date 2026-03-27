@@ -31,11 +31,11 @@ database_url = os.getenv('DATABASE_URL')
 flask_env = os.getenv('FLASK_ENV', 'development')
 
 # Enable CORS - Restrict in production
-cors_origins = os.getenv('CORS_ORIGINS', 'http://localhost:5000').split(',')
+cors_origins = os.getenv('CORS_ORIGINS', 'http://localhost:5000,https://spm-effort-estimation-cost-planning.vercel.app').split(',')
 if flask_env == 'production':
-    CORS(app, resources={r"/api/*": {"origins": cors_origins}})
+    CORS(app, resources={r"/api/*": {"origins": cors_origins}}, supports_credentials=True)
 else:
-    CORS(app)
+    CORS(app, supports_credentials=True)
 
 if database_url:
     # Production: Use PostgreSQL from Supabase

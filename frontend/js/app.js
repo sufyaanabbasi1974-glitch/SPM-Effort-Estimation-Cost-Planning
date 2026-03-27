@@ -3,11 +3,14 @@
 // Global variables
 // API Base URL - automatically configured based on environment
 const API_BASE = (() => {
-    // Get from window (set in HTML for production)
-    if (window.API_BASE) return window.API_BASE;
-    // Default for local development
-    return '/api';
+    if (window.API_BASE) {
+        return window.API_BASE;
+    }
+    // Fallback local
+    return 'http://127.0.0.1:5000';
 })();
+
+console.log('Using API_BASE:', API_BASE);
 
 let currentProjectId = null;
 let chartInstances = {};
@@ -153,6 +156,7 @@ function clearAllData() {
             // Clear all data from backend
             fetch(`${API_BASE}/clear-all-data`, {
                 method: 'POST',
+                credentials: 'include',
                 headers: { 'Content-Type': 'application/json' }
             })
                 .then(res => res.json())
@@ -245,7 +249,7 @@ function importData() {
 
 async function checkAuth() {
     try {
-        const response = await fetch('/api/user');
+        const response = await fetch(`${API_BASE}/api/user`, { credentials: 'include' });
         if (response.status === 401) {
             // Not authenticated, redirect to login
             window.location.href = '/login';
@@ -369,6 +373,7 @@ function handleProjectSubmit(e) {
 
     fetch(`${API_BASE}/projects`, {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(projectData)
     })
@@ -391,7 +396,7 @@ function handleProjectSubmit(e) {
 }
 
 function loadProjects() {
-    fetch(`${API_BASE}/projects`)
+    fetch(`${API_BASE}/projects`, { credentials: 'include' })
         .then(res => res.json())
         .then(projects => {
             const projectList = document.getElementById('projectList');
@@ -438,7 +443,7 @@ function loadProjectsForModule(moduleId) {
     const selectId = selectIds[moduleId];
     if (!selectId) return;
 
-    fetch(`${API_BASE}/projects`)
+    fetch(`${API_BASE}/projects`, { credentials: 'include' })
         .then(res => res.json())
         .then(projects => {
             const select = document.getElementById(selectId);
@@ -473,6 +478,7 @@ function calculateBasicCOCOMO() {
 
     fetch(`${API_BASE}/estimations/basic-cocomo/${currentProjectId}`, {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({})
     })
@@ -540,6 +546,7 @@ function calculateIntermediateCOCOMO() {
 
     fetch(`${API_BASE}/estimations/intermediate-cocomo/${currentProjectId}`, {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ multipliers: multipliers })
     })
@@ -609,7 +616,7 @@ function loadScheduleData() {
 
     currentProjectId = projectId;
 
-    fetch(`${API_BASE}/projects/${projectId}`)
+    fetch(`${API_BASE}/projects/${projectId}`, { credentials: 'include' })
         .then(res => res.json())
         .then(project => {
             // Display project info
@@ -734,6 +741,7 @@ function handleRiskSubmit(e) {
 
     fetch(`${API_BASE}/risks/${currentProjectId}`, {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(riskData)
     })
@@ -754,7 +762,7 @@ function handleRiskSubmit(e) {
 }
 
 function displayProjectRisks(projectId) {
-    fetch(`${API_BASE}/risks/${projectId}`)
+    fetch(`${API_BASE}/risks/${projectId}`, { credentials: 'include' })
         .then(res => res.json())
         .then(risks => {
             const riskList = document.getElementById('riskList');
@@ -790,6 +798,7 @@ function applyRiskAdjustments() {
 
     fetch(`${API_BASE}/risks/${currentProjectId}/apply-adjustments`, {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({})
     })
@@ -845,6 +854,7 @@ function handleEVMSubmit(e) {
 
     fetch(`${API_BASE}/evm/${currentProjectId}`, {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(evmData)
     })
@@ -968,7 +978,7 @@ function loadDashboard() {
     const projectId = document.getElementById('dashboardProject').value;
     if (!projectId) return;
 
-    fetch(`${API_BASE}/reports/${projectId}`)
+    fetch(`${API_BASE}/reports/${projectId}`, { credentials: 'include' })
         .then(res => res.json())
         .then(data => {
             let html = `
@@ -1035,7 +1045,7 @@ function loadReport() {
     const projectId = document.getElementById('reportProject').value;
     if (!projectId) return;
 
-    fetch(`${API_BASE}/reports/${projectId}`)
+    fetch(`${API_BASE}/reports/${projectId}`, { credentials: 'include' })
         .then(res => res.json())
         .then(data => {
             generateReportHTML(data);
