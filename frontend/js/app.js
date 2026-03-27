@@ -1,7 +1,26 @@
 // SPM Effort Estimation System - Main Application Logic
 
 // Global variables
-const API_BASE = '/api';
+// Determine API base URL based on environment
+const API_BASE = (() => {
+    const hostname = window.location.hostname;
+    const protocol = window.location.protocol;
+    
+    // For localhost, use /api (backend proxy)
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        return '/api';
+    }
+    
+    // For Vercel deployed frontend, use environment variable or direct backend URL
+    // Check for meta tag or window variable set at runtime
+    if (typeof window !== 'undefined' && window.API_BASE) {
+        return window.API_BASE;
+    }
+    
+    // Fallback: use /api (should be configured via reverse proxy in deployment)
+    return '/api';
+})();
+
 let currentProjectId = null;
 let chartInstances = {};
 let activityHistory = [];

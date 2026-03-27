@@ -420,6 +420,13 @@
             margin: 0;
         }
     </style>
+    <meta name="api-base" content="https://your-backend-url.railway.app">
+    <script>
+        // Set API base URL from environment or meta tag
+        window.API_BASE = localStorage.getItem('API_BASE') || 
+                         document.querySelector('meta[name="api-base"]')?.content || 
+                         '/api';
+    </script>
 </head>
 <body>
     <div class="login-container">
