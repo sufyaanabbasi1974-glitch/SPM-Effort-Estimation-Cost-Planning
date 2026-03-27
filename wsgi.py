@@ -5,12 +5,12 @@ Properly handles imports from backend directory
 import sys
 import os
 
-# Add backend directory to Python path
-backend_dir = os.path.join(os.path.dirname(__file__), 'backend')
-sys.path.insert(0, backend_dir)
+# Add project root to Python path so backend can be imported as a package
+project_root = os.path.dirname(__file__)
+sys.path.insert(0, project_root)
 
-# Now import and run the app
-from app import app
+# Now import the Flask app from backend
+from backend.app import app
 
 if __name__ == '__main__':
     app.run()

@@ -7,9 +7,9 @@ from functools import wraps
 from flask import Flask, render_template, request, jsonify, send_from_directory, session, redirect, url_for
 from flask_cors import CORS
 from dotenv import load_dotenv
-from models import db, Project, Estimation, Risk, EVMTracking
-from cocomo_calculator import COCOMOCalculator
-from evm_calculator import EVMCalculator
+from .models import db, Project, Estimation, Risk, EVMTracking
+from .cocomo_calculator import COCOMOCalculator
+from .evm_calculator import EVMCalculator
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 
